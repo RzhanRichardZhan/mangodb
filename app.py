@@ -1,10 +1,7 @@
 from flask import Flask, render_template, request
-import pymongo
+from pymongo import Connection
 app = Flask(__name__)
 
-def makeDB():
-    conn = Connection()
-    db = conn['ayrz']
 
 def testDB():
     db.test.insert({'hi':'hi'})
@@ -15,15 +12,18 @@ def testDB():
 def home():
     if request.method == "POST":
         form = request.form
-    if form["submit"] == 'yes' and form['user'] != "" and form["pass"] != "":
-        names = db.info.find()
-        if names.has_key(form['user']):
-            if names[form['user']]==form['pass']:
-                print "<h1>USERNAME + PASSWORD CORRECT</h1>"
-                #USERNAME + PASSWORD CORRECT
-            else:
-                print "<h1>USERNAME + PASSWORD WRONG</h1>"
-                #USERNAME + PASSWORD WRONG
+        worked = False
+        if form["submit"] == 'yes' and form['user'] != "" and form["pass"] != "":
+            names = db.info.find()
+            #NAMES = LIST OF DICTIONARIES
+            for person in names:
+                if person['user']==form['user']:
+                    if person['pass']==form['pass']:
+                        worked = True                        
+        if worked:
+            print "YOU CAN GET LOGGED IN"
+        else:
+            print "YOU CAN'T LOG IN"
     return render_template("home.html")
 
 @app.route("/register",methods=["POST","GET"])
@@ -41,11 +41,12 @@ def register():
                 message = "Passwords Are Too Short!"
                 color = "red"
             else:
+                db.info.insert({'user':form['user'],'pass':form['pass']})
                 message = "Successfully Registered!"
     return render_template("register.html",m=message, c=color)
 
 if __name__ == "__main__":
-    #makeDB()
-    #testDB()
+    conn = Connection()
+    db = conn['ayrz']
     app.debug = True
     app.run()
