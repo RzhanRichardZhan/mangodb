@@ -29,12 +29,20 @@ def home():
 @app.route("/register",methods=["POST","GET"])
 def register():
     message = ""
+    color = "green"
     if request.method == "POST":
         form = request.form
         if form["submit"] == 'yes' and form['user'] != "" and form["pass"] != "":
             #mongostuff
-            message = "Successfully Registered!"
-    return render_template("register.html",m=message)
+            if form["pass"] != form["pass2"]:
+                message = "Passwords Do Not Match!"
+                color = "red"
+            elif len(form["pass"]) < 5:
+                message = "Passwords Are Too Short!"
+                color = "red"
+            else:
+                message = "Successfully Registered!"
+    return render_template("register.html",m=message, c=color)
 
 if __name__ == "__main__":
     #makeDB()
