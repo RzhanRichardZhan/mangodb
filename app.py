@@ -1,13 +1,11 @@
 from flask import Flask, render_template, request
 from pymongo import Connection
+
+
 app = Flask(__name__)
 
 
-def testDB():
-    db.test.insert({'hi':'hi'})
 
-
-    
 @app.route("/", methods=["POST","GET"])
 def home():
     if request.method == "POST":
@@ -21,10 +19,13 @@ def home():
                     if person['pass']==form['pass']:
                         worked = True                        
         if worked:
-            print "YOU CAN GET LOGGED IN"
+            print "YOU CAN LOG IN"
         else:
             print "YOU CAN'T LOG IN"
     return render_template("home.html")
+
+
+
 
 @app.route("/register",methods=["POST","GET"])
 def register():
@@ -44,6 +45,9 @@ def register():
                 db.info.insert({'user':form['user'],'pass':form['pass']})
                 message = "Successfully Registered!"
     return render_template("register.html",m=message, c=color)
+
+
+
 
 if __name__ == "__main__":
     conn = Connection()
