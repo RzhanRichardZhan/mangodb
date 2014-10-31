@@ -50,6 +50,10 @@ def account():
     #return render_template("account.html")
     return "HEY ITS THE ACCOUNT PAGE"
 
+@app.route("/about")
+def about():
+    #return render_template("about.html")
+    return "HEY ITS THE ABOUT PAGE"
 
 if __name__ == "__main__":
     conn = Connection()
