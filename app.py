@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, abort
 from pymongo import Connection
 
 
@@ -19,11 +19,10 @@ def home():
                     if person['pass']==form['pass']:
                         worked = True                        
         if worked:
-            print "YOU CAN LOG IN"
+            return redirect(url_for('account'))
         else:
-            print "YOU CAN'T LOG IN"
+            return render_template("home.html",text = "Incorrect password or username")
     return render_template("home.html")
-
 
 
 
@@ -46,7 +45,10 @@ def register():
                 message = "Successfully Registered!"
     return render_template("register.html",m=message, c=color)
 
-
+@app.route("/account")
+def account():
+    #return render_template("account.html")
+    return "HEY ITS THE ACCOUNT PAGE"
 
 
 if __name__ == "__main__":
