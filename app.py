@@ -47,7 +47,7 @@ def register():
 
 @app.route("/account")
 def account():
-    #return render_template("account.html")
+    return render_template("account.html")
     return "HEY ITS THE ACCOUNT PAGE"
 
 @app.route("/about")
