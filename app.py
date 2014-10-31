@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, request, redirect, url_for, abort, session, escape
 from pymongo import Connection
 
 
@@ -8,6 +8,8 @@ app = Flask(__name__)
 
 @app.route("/", methods=["POST","GET"])
 def home():
+    if 'username' in session:
+        return redirect(url_for('account'))
     if request.method == "POST":
         form = request.form
         worked = False
@@ -47,12 +49,21 @@ def register():
 
 @app.route("/account")
 def account():
+    """
+    if !('username' in session):
+       return "STOP TRYIN TO CHEAT THE MANGO STORE"
+    """
     return render_template("account.html")
     return "HEY ITS THE ACCOUNT PAGE"
 
+@app.route("/logout")
+def logout():
+    #CLEAR ALL COOKIES
+    return redirect(url_for("home"))
+
 @app.route("/about")
 def about():
-    #return render_template("about.html")
+    return render_template("about.html")
     return "HEY ITS THE ABOUT PAGE"
 
 if __name__ == "__main__":
