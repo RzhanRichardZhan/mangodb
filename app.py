@@ -46,21 +46,33 @@ def register():
                 color = "red"
             else:
                 if db.info.find_one({'user':form['user']}) == None:
-                    db.info.insert({'user':form['user'],'pass':form['pass']})
+                    db.info.insert({'user':form['user'],'pass':form['pass'], 'mango':0})
                     message = "Successfully Registered!"
                 else:
                     message = "Username Already Registered!"
                     color = "red"
     return render_template("register.html",m=message, c=color)
 
-@app.route("/account")
+@app.route("/account", methods=["POST","GET"])
 def account():
-    
     if not ('username' in session):
        return "STOP TRYIN TO CHEAT THE MANGO STORE"
-    
-    return render_template("account.html",u=session['username'])
 
+    number = db.info.find_one({"user":session["username"]})["mango"]
+    print "check 1"
+    if request.method == "POST":
+        form = request.form
+        print "check 2"
+        if form["grow"] == 'yes':
+            db.info.update({'user':session['username']},{'$inc':{'mango': 1}},upsert=False, multi=False)
+        elif form["sell"] == 'yes' and number > "0":
+            print number
+            db.info.update({'user':session['username']},{'$inc':{'mango': -1}},upsert=False, multi=False)
+            print str(number) + " after"
+        elif form["reset"] == "yes":
+            db.info.update({'user':session['username']},{'$set':{'mango': 0}},upsert=False, multi=False)
+        
+    return render_template("account.html",u=session['username'], number = number)
 @app.route("/logout")
 def logout():
     #CLEAR ALL COOKIES
@@ -74,6 +86,15 @@ def about():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
+
+@app.route("/addmango")
+def addmango():
+    """
+    names = db.info.find()
+    for person in names:
+        if person['user']==form['user']:
+            """
+    pass
 
 if __name__ == "__main__":
     
