@@ -59,10 +59,10 @@ def account():
        return "STOP TRYIN TO CHEAT THE MANGO STORE"
 
     number = db.info.find_one({"user":session["username"]})["mango"]
-    print "check 1"
+    
     if request.method == "POST":
         form = request.form
-        print "check 2"
+        
         if form["grow"] == 'yes':
             db.info.update({'user':session['username']},{'$inc':{'mango': 1}},upsert=False, multi=False)
             number = number + 1
@@ -90,18 +90,10 @@ def about():
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
 
-@app.route("/addmango")
-def addmango():
-    """
-    names = db.info.find()
-    for person in names:
-        if person['user']==form['user']:
-            """
-    pass
 
 if __name__ == "__main__":
     
     conn = Connection()
     db = conn['ayrz']
     app.debug = True
-    app.run()
+    app.run(host="0.0.0.0")
