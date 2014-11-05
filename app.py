@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, abort, session, escape
+from flask import Flask, render_template, request, redirect, url_for, abort, session, escape, flash
 from pymongo import Connection
 
 
@@ -37,7 +37,7 @@ def register():
     if request.method == "POST":
         form = request.form
         if form["submit"] == 'yes' and form['user'] != "" and form["pass"] != "":
-            #mongostuff
+            #if only we used the flash stuff
             if form["pass"] != form["pass2"]:
                 message = "Passwords Do Not Match!"
                 color = "red"
@@ -56,8 +56,8 @@ def register():
 @app.route("/account", methods=["POST","GET"])
 def account():
     if not ('username' in session):
-       return "STOP TRYIN TO CHEAT THE MANGO STORE"
-
+       #return "STOP TRYIN TO CHEAT THE MANGO STORE"
+       return redirect(url_for("home"))
     number = db.info.find_one({"user":session["username"]})["mango"]
     
     if request.method == "POST":
@@ -72,19 +72,24 @@ def account():
 @app.route("/leader")
 def leader():
     if 'username' not in session:
-        return "STOP TRYIN TO CHEAT THE MANGO STORE"
+        #return "STOP TRYIN TO CHEAT THE MANGO STORE"
+        return redirect(url_for("home"))
     a = db.info.find()
     data = [ (x["user"],x["mango"]) for x in a]
-    return render_template("leader.html",data = data)
+    return render_template("leader.html",data = data, u = session["username"])
     
 @app.route("/logout")
 def logout():
+    #this counts as a page right
     session.pop("username",None)
     return redirect(url_for("home"))
 
 @app.route("/about")
 def about():
-    return render_template("about.html")
+    text = ""
+    if 'username' in session:
+        text = "You are logged in " + session["username"]
+    return render_template("about.html",text=text)
 
 @app.errorhandler(404)
 def page_not_found(error):
