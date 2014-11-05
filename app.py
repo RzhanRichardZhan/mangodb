@@ -73,6 +73,16 @@ def account():
             db.info.update({'user':session['username']},{'$set':{'mango': 0}},upsert=False, multi=False)
         
     return render_template("account.html",u=session['username'], number = number)
+    
+@app.route("/leader")
+def leader():
+    a = db.info.find()
+    data = []
+    for diction in a:
+        if not diction["name"]=="test1" and not diction["name"]=='derp':
+            data.append(data)
+    return render_template("leader.html",data = data)
+    
 @app.route("/logout")
 def logout():
     #CLEAR ALL COOKIES
