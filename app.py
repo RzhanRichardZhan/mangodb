@@ -5,7 +5,13 @@ from pymongo import Connection
 app = Flask(__name__)
 app.secret_key='{\xdft\xb7\x06f\x9b\xa4\x0eP\xe1n\xdd\xd4\x93\x01\xd3`\xc1\xe5\xc1|\x0e`'
 
-
+def authenticate(f):
+    def inner():
+        if username in session:
+            return f:
+        else:
+            return redirect(url_for('register'))
+    return inner
 
 @app.route("/", methods=["POST","GET"])
 def home():
@@ -52,12 +58,9 @@ def register():
                     message = "Username Already Registered!"
                     color = "red"
     return render_template("register.html",m=message, c=color)
-
+@authenticate
 @app.route("/account", methods=["POST","GET"])
 def account():
-    if not ('username' in session):
-       #return "STOP TRYIN TO CHEAT THE MANGO STORE"
-       return redirect(url_for("home"))
     number = db.info.find_one({"user":session["username"]})["mango"]
     
     if request.method == "POST":
@@ -69,26 +72,25 @@ def account():
         
     return render_template("account.html",u=session['username'], number = number)
     
+@authenticate
 @app.route("/leader")
 def leader():
-    if 'username' not in session:
-        #return "STOP TRYIN TO CHEAT THE MANGO STORE"
-        return redirect(url_for("home"))
     a = db.info.find()
     data = [ (x["user"],x["mango"]) for x in a]
     return render_template("leader.html",data = data, u = session["username"])
     
+@authenticate
 @app.route("/logout")
 def logout():
     #this counts as a page right
     session.pop("username",None)
     return redirect(url_for("home"))
 
+@authenticate
 @app.route("/about")
 def about():
     text = ""
-    if 'username' in session:
-        text = "You are logged in " + session["username"]
+    text = "You are logged in " + session["username"]
     return render_template("about.html",text=text)
 
 @app.errorhandler(404)
